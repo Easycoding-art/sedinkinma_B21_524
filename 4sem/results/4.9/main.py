@@ -24,7 +24,6 @@ def get_pixel(pixel_grad, T) :
 def Prewitt_algolitmn(image, T) :
   img = semitone(image)
   image_arr = np.array(img)
-  #new_image_arr = np.zeros(shape=image_arr.shape)
   mask_x = np.array([[-1, -1, -1, -1, -1],
                     [0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0],

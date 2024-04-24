@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import numpy as np
 import random
-from matplotlib import pyplot as plt
+import helper
 
 def create_alphabet(font_path, alphabet, path_name) :
     os.mkdir(path_name)
@@ -20,11 +20,14 @@ def create_alphabet(font_path, alphabet, path_name) :
             font=font,
             anchor="mm",
             fill=(0, 0, 0))
+        binary_img = helper.Otsu_binarization(im)
+        image = t.get_text_box(t.split_colors(binary_img), 17, 90)
+        symbol = t.split_colors(image)
         if i >= 10 :
             name = arr[i-10]
         else :
             name = i
-        im.save(f'{path_name}/{name}.png')
+        symbol.save(f'{path_name}/{name}.png')
 
 def set_tests(font_path, alphabet, test_count) :
     os.mkdir('test_cases')
@@ -39,7 +42,8 @@ def set_tests(font_path, alphabet, test_count) :
     language = alphabet.copy()
     language.append(' ')
     for j in range(test_count) :
-        size = random.randint(10, 90)
+        #size = random.randint(10, 90)
+        size = 90
         word_len = random.randint(0, 40)
         word = ''
         for k in range(word_len) :
@@ -85,16 +89,14 @@ def get_characterics(file_path) :
     moment_135_s = []
     moment_45_rels = []
     moment_135_rels = []
+    os.mkdir('profiles')
     for file in files :
         img = Image.open(f'{file_path}/{file}')
         image_arr = np.array(img)
         width, height = img.size
         new_image_arr = np.zeros(shape=(height, width))
-        for x in range(width):
-            for y in range(height):
-                new_image_arr[y, x] = (image_arr[y, x, 0] + image_arr[y, x, 1] + image_arr[y, x, 2])/3
         new_arr = np.zeros(new_image_arr.shape)
-        new_arr[new_image_arr != 255] = 1
+        new_arr[image_arr != 255] = 1
         #weight
         weight = new_arr.sum()
         normalized_weight = weight / (new_image_arr.shape[0] * new_image_arr.shape[1])
@@ -131,18 +133,8 @@ def get_characterics(file_path) :
         moment_45_rel = moment_45/(new_image_arr.shape[0]**2 * new_image_arr.shape[1]**2)
         moment_135_rel = moment_135/(new_image_arr.shape[0]**2 * new_image_arr.shape[1]**2)
         #профили
-        #x
         name = file.replace('.png', '')
-        os.makedirs(f'profiles/{name}')
-        result = np.sum(new_arr, axis=1).tolist()
-        groups = [i for i in range(new_arr.shape[0])]
-        plt.bar(groups, result)
-        plt.savefig(f'profiles/{name}/x.png')
-        #y
-        result = np.sum(new_arr, axis=0).tolist()
-        groups = [i for i in range(new_arr.shape[1])]
-        plt.barh(groups, result)
-        plt.savefig(f'profiles/{name}/y.png')
+        helper.save_profiles(img, name, 'profiles')
         #adding
         weights.append(weight)
         normalized_weights.append(normalized_weight)

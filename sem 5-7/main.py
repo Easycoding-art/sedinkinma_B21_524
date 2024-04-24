@@ -14,4 +14,6 @@ def start_experiment(letters, font, lang_name, test_number) :
 
 if __name__ == '__main__' :
     letters = list('ءآأؤإئاةتثجحخدذرزسشصضطظعغ')
-    start_experiment(letters, 'c:\WINDOWS\Fonts\ARIAL.TTF', 'Arabian', 20)
+    start_experiment(letters, 'c:\WINDOWS\Fonts\ARIAL.TTF', 'Arabian', 1)
+    #letters = list('QWERTYUIOPASDFGHJKLZXCVBNM')
+    #start_experiment(letters, 'c:\WINDOWS\Fonts\ARIAL.TTF', 'English', 1)

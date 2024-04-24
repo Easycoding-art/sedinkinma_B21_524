@@ -1,6 +1,7 @@
 import math
 import numpy as np
 from PIL import Image
+from matplotlib import pyplot as plt
 
 def semitone(image) :
   src = image.convert('RGB')
@@ -54,10 +55,68 @@ def get_diff(original, recognized) :
             k+=1
     return diff + k
 
-def Manhatten(arr1, arr2) :
+def Evclid(arr1, arr2) :
     if len(arr1) != len(arr2) :
         raise ValueError('Length of arrays must be same!')
     p = 0
     for i in range(len(arr1)) :
-        p += max(-(arr2[i] - arr2[i]), arr2[i] - arr2[i])
-    return p
+        p += (arr1[i] - arr2[i])**2
+    return math.sqrt(p)
+
+def get_profiles(image):
+    image_arr = np.array(image)
+    image_arr[image_arr == 0] = 1
+    image_arr[image_arr == 0] = 0
+    w, h = image_arr.shape
+    return {
+        'x': {
+            'y': np.sum(image_arr, axis=0),
+            'x': np.arange(start=1, stop=h + 1).astype(int)
+        },
+        'y': {
+            'y': np.arange(start=1, stop=w + 1).astype(int),
+            'x': np.sum(image_arr, axis=1)
+        }
+    }
+
+def save_profiles(img, name, file_path):
+    profiles = get_profiles(img)
+    fig, axs = plt.subplots(nrows= 2 , ncols= 1 )
+    #add data to plots
+    axs[0].bar(x=profiles['x']['x'], height=profiles['x']['y'], width=0.9)
+    axs[0].axis(xmin=0,xmax=90, ymin=0,ymax=90)
+    #axs[0].ylim(0, 90)
+    #axs[0].xlim(0, 90)
+    #axs[0].subtitle('X')
+    axs[1].barh(y=profiles['y']['y'], width=profiles['y']['x'], height=0.9)
+    axs[1].axis(xmin=0,xmax=90, ymin=90,ymax=0)
+    #axs[1].ylim(90, 0)
+    #axs[1].xlim(0, 90)
+    #axs[1].subtitle('Y')
+    plt.savefig(f'{file_path}/{name}.png')
+    plt.clf()
+
+def calculate_profiles(img):
+    image_arr = np.array(img)
+    image_arr[image_arr == 0] = 1
+    image_arr[image_arr == 0] = 0
+    profile_x = np.sum(img, axis=0)
+    profile_y = np.sum(img, axis=1)
+    return {
+        'x': profile_x,
+        'y': profile_y
+    }
+
+def split_colors(image) :
+    image_arr = np.array(image)
+    image_arr[image_arr == 0] = 1
+    image_arr[image_arr == 255] = 0
+    image_arr[image_arr == 1] = 255
+    return Image.fromarray(image_arr.astype(np.uint8), 'L')
+
+def make_normal(image) :
+    image_arr = np.array(image)
+    if image_arr[0, 0] == 255 :
+        return split_colors(image)
+    else :
+        return image

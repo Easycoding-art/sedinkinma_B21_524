@@ -48,12 +48,16 @@ def Otsu_binarization(image) :
   return new_image
 
 def get_diff(original, recognized) :
-    diff = len(recognized) - len(original)
+    len_diff = abs(len(recognized) - len(original))
+    if len(recognized) > len(original) :
+        original = original + '#'*len_diff
+    else :
+        recognized = recognized + '#'*len_diff
     k = 0
     for i in range(len(original)) :
-        if original[i] == recognized[i] :
+        if original[i] != recognized[i] :
             k+=1
-    return diff + k
+    return k
 
 def Evclid(arr1, arr2) :
     if len(arr1) != len(arr2) :
